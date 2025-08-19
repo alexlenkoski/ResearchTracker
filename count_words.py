@@ -34,11 +34,11 @@ def process_commit(commit):
             patch = diff.diff.decode('utf-8', errors='ignore')
             lines = patch.splitlines()
 
-        for line in lines:
-            if line.startswith('+') and not line.startswith('+++'):
-                words_changed += len(line.split())
-            if line.startswith('-') and not line.startswith('---'):
-                words_changed -= len(line.split())
+            for line in lines:
+                if line.startswith('+') and not line.startswith('+++'):
+                    words_changed += len(line.split())
+                if line.startswith('-') and not line.startswith('---'):
+                    words_changed -= len(line.split())
     
     return words_changed
 
@@ -66,11 +66,11 @@ def main():
                     total_changed += abs(changed)
 
                 
-            print(f"Repository: {entry}, Words Changed: {total_changed}")
+            print(f"{entry}, Words Changed: {total_changed}")
             grand_total_changed += total_changed
 
 
-        print(f"Grand total changed: {grand_total_changed}")
+    print(f"Grand total changed: {grand_total_changed}")
 
 if __name__ == "__main__":
     main()

@@ -1,10 +1,11 @@
 #! /home/alex/miniforge3/envs/pytorch_env/bin/python
-
-import argparse
 import os
 import sys
+import argparse
 from git import Repo, InvalidGitRepositoryError
 from datetime import datetime, date
+import subprocess
+from pathlib import Path
 
 def get_target_date():
     if len(sys.argv) > 1:
@@ -47,13 +48,11 @@ def find_git_repos(base_path):
             dirs[:] = []  # Don't recurse into subdirectories of a repo
     return git_repos
 
-def main():
+def get_code_lines(target_date):
 
     base_path = '/home/alex/pkg/'
     author_name = 'alexlenkoski'
     excluded_message = "Cleanup"
-    target_date = get_target_date()
-    
     total_changes = 0
     for repo_path in find_git_repos(base_path):
         total_changes += count_changes_in_repo(repo_path,
@@ -61,27 +60,8 @@ def main():
                                                'alexlenkoski',
                                                excluded_message)
 
-    print(total_changes)
+    print(f'Total code churn: {total_changes}')
 
-if __name__ == "__main__":
-    main()
-
-    #!/usr/bin/env python3
-
-import os
-import sys
-import difflib
-from datetime import datetime, date
-from git import Repo
-
-def get_target_date():
-    if len(sys.argv) > 1:
-        try:
-            return datetime.strptime(sys.argv[1], "%Y-%m-%d").date()
-        except ValueError:
-            print("Invalid date format. Use YYYY-MM-DD.")
-            sys.exit(1)
-    return date.today()
 
 def is_git_repo(path):
     try:
@@ -110,12 +90,11 @@ def process_commit(commit):
     
     return words_changed
 
-def main():
+def get_word_changes(target_date):
+
     base_path = "/home/alex/articles"
     author = "alexlenkoski"
     excluded_message = "Cleanup"
-    target_date = get_target_date()
-
     grand_total_changed = 0
 
     for entry in os.listdir(base_path):
@@ -134,26 +113,13 @@ def main():
                     total_changed += abs(changed)
 
                 
-            print(f"{entry}, Words Changed: {total_changed}")
+            ## print(f"{entry}, Words Changed: {total_changed}")
             grand_total_changed += total_changed
 
 
-    print(f"Grand total changed: {grand_total_changed}")
+    print(f"Total words changed: {grand_total_changed}")
 
-if __name__ == "__main__":
-    main()
-
-    #!  /home/alex/miniforge3/envs/pytorch_env/bin/python
-import os
-import subprocess
-from pathlib import Path
-
-PKG_DIR = Path.home() / "pkg"
-
-import os
-import subprocess
-
-def check_uncommitted_repos(root_dir=PKG_DIR):
+def check_uncommitted_repos(root_dir):
     """Check which repos have uncommitted changes (modified/untracked files)."""
     clean = []
     dirty = []
@@ -180,8 +146,17 @@ def check_uncommitted_repos(root_dir=PKG_DIR):
         print("Commit These:")
         for repo in dirty:
             print(f"  - {repo}")
+        return 0
     else:
-        print("You good bro")
+        return 1
 
 if __name__ == "__main__":
-    check_uncommitted_repos()
+
+    target_date = get_target_date()
+    print('*** Checking Codebase ***')
+    _ = check_uncommitted_repos('/home/alex/pkg/')
+    get_code_lines(target_date)
+    check_uncommitted_repos('/home/alex/articles/')
+    print('*** Checking Writing ***')
+    _ = check_uncommitted_repos('/home/alex/articles/')
+    get_word_changes(target_date)

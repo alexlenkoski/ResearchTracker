@@ -156,7 +156,6 @@ if __name__ == "__main__":
     print('*** Checking Codebase ***')
     _ = check_uncommitted_repos('/home/alex/pkg/')
     get_code_lines(target_date)
-    check_uncommitted_repos('/home/alex/articles/')
     print('*** Checking Writing ***')
     _ = check_uncommitted_repos('/home/alex/articles/')
     get_word_changes(target_date)

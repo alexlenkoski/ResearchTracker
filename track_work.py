@@ -129,18 +129,19 @@ def check_uncommitted_repos(root_dir):
         repo = all_repos[i]
         repo_path = os.path.join(root_dir, repo)
 
-        result = subprocess.run(
-            ["git", "-C", repo_path, "status", "--porcelain"],
-            capture_output = True,
-            text = True,
-            check = True
-        )
-        status = result.stdout.strip()
-        
-        if status:  # any output means uncommitted changes
-            dirty.append(repo)
-        else:
-            clean.append(repo)
+        if is_git_repo(repo_path):
+            result = subprocess.run(
+                ["git", "-C", repo_path, "status", "--porcelain"],
+                capture_output = True,
+                text = True,
+                check = True
+            )
+            status = result.stdout.strip()
+            
+            if status:  # any output means uncommitted changes
+                dirty.append(repo)
+            else:
+                clean.append(repo)
 
     if dirty:
         print("Commit These:")
